@@ -5,8 +5,14 @@ export class WikiPage extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id!: string;
 
-  @Column({ type: 'varchar' })
+  @Column({nullable: true})
+  public level!: number;
+
+  @Column({ type: 'varchar', nullable: true })
   public name!: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  public ownerId!: string;
 
   @ManyToOne(() => WikiPage, page => page.children)
   public parent!: WikiPage;

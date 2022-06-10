@@ -6,32 +6,103 @@ import { Observable } from 'rxjs';
 
 export const protobufPackage = 'wiki';
 
-export interface AddOneRequest {
-  parentId: string;
-  name: string;
+/** GET */
+export interface GetRootsRequest {}
+
+export interface GetRootsResponse {
+  status: number;
+  error: string[];
 }
 
-export interface AddOneResponse {
+export interface GetByIdRequest {
+  id: string;
+}
+
+export interface GetByIdResponse {
+  status: number;
+  id: string;
+  name: string;
+  children: WikiPage[];
+  error: string[];
+}
+
+/** ADD */
+export interface AddPageRequest {
+  level: number;
+  name: string;
+  parentId: string;
+}
+
+export interface AddPageResponse {
   status: number;
   error: string[];
   id: string;
 }
 
+/** REMOVE */
+export interface RemovePageRequest {
+  id: string;
+}
+
+export interface RemovePageResponse {
+  status: number;
+  error: string[];
+}
+
+/** Entities */
+export interface WikiPage {
+  level: number;
+  id: string;
+  name: string;
+  parentId: string;
+  ownerId: string;
+  children: WikiPage[];
+}
+
 export const WIKI_PACKAGE_NAME = 'wiki';
 
 export interface WikiServiceClient {
-  addOne(request: AddOneRequest): Observable<AddOneResponse>;
+  getRoots(request: GetRootsRequest): Observable<GetRootsResponse>;
+
+  getById(request: GetByIdRequest): Observable<GetByIdResponse>;
+
+  addPage(request: AddPageRequest): Observable<AddPageResponse>;
+
+  removePage(request: RemovePageRequest): Observable<RemovePageResponse>;
 }
 
 export interface WikiServiceController {
-  addOne(
-    request: AddOneRequest,
-  ): Promise<AddOneResponse> | Observable<AddOneResponse> | AddOneResponse;
+  getRoots(
+    request: GetRootsRequest,
+  ):
+    | Promise<GetRootsResponse>
+    | Observable<GetRootsResponse>
+    | GetRootsResponse;
+
+  getById(
+    request: GetByIdRequest,
+  ): Promise<GetByIdResponse> | Observable<GetByIdResponse> | GetByIdResponse;
+
+  addPage(
+    request: AddPageRequest,
+  ): Promise<AddPageResponse> | Observable<AddPageResponse> | AddPageResponse;
+
+  removePage(
+    request: RemovePageRequest,
+  ):
+    | Promise<RemovePageResponse>
+    | Observable<RemovePageResponse>
+    | RemovePageResponse;
 }
 
 export function WikiServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['addOne'];
+    const grpcMethods: string[] = [
+      'getRoots',
+      'getById',
+      'addPage',
+      'removePage',
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
