@@ -1,22 +1,31 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({name: 'pages'})
 export class WikiPage extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  public id!: string;
+  public id: string;
 
   @Column({nullable: true})
-  public level!: number;
+  public isRoot: boolean;
 
   @Column({ type: 'varchar', nullable: true })
-  public name!: string;
+  public name: string;
+
+  @Column({ type: 'simple-json', nullable: true })
+  public html: string;
 
   @Column({ type: 'varchar', nullable: true })
-  public ownerId!: string;
+  public ownerId: string;
 
   @ManyToOne(() => WikiPage, page => page.children)
-  public parent!: WikiPage;
+  public parent: WikiPage;
 
   @OneToMany(() => WikiPage, (page) => page.parent)
   public children: WikiPage[];
+
+  @CreateDateColumn()
+  public created_at: Date;
+
+  @UpdateDateColumn()
+  public update_at: Date;
 }

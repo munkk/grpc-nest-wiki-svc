@@ -10,6 +10,7 @@ export const protobufPackage = 'wiki';
 export interface GetRootsRequest {}
 
 export interface GetRootsResponse {
+  data: any[];
   status: number;
   error: string[];
 }
@@ -28,9 +29,9 @@ export interface GetByIdResponse {
 
 /** ADD */
 export interface AddPageRequest {
-  level: number;
   name: string;
   parentId: string;
+  html: string;
 }
 
 export interface AddPageResponse {
@@ -51,12 +52,14 @@ export interface RemovePageResponse {
 
 /** Entities */
 export interface WikiPage {
-  level: number;
   id: string;
-  name: string;
+  isRoot: boolean;
   parentId: string;
-  ownerId: string;
+  name: string;
+  html: string;
   children: WikiPage[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const WIKI_PACKAGE_NAME = 'wiki';

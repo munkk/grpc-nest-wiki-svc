@@ -11,21 +11,35 @@ export class WikiService {
   @InjectRepository(WikiPage)
   private readonly repository: Repository<WikiPage>;
 
+  public async getRoots(payload: GetRootsRequest): Promise<GetRootsResponse> {
+    try {
+      const pages = await this.repository.find({
+        where: { 
+          isRoot: true 
+        }
+      })
+      return { data: pages, error: null, status: HttpStatus.OK };
+    } catch (err) {
+      return { data: null, error: err.detail, status: HttpStatus.OK  };
+    }
+  } 
+
   public async addPage(payload: AddPageRequest): Promise<AddPageResponse> {
-    let parent = null;  
+    let parent: WikiPage = null;  
     if (payload.parentId) {
         parent = await this.repository.findOneBy({
             id: payload.parentId
         })
     }
 
-    const product: WikiPage = new WikiPage();
-    product.parent = parent;
-    product.name = payload.name;
+    const newPage = await this.repository.create({
+      ...payload,
+      isRoot: !Boolean(parent),
+      parent: parent
+    });
+    await this.repository.save(newPage);
 
-    await this.repository.save(product);
-
-    return { id: product.id, error: null, status: HttpStatus.OK };
+    return { id: newPage.id, error: null, status: HttpStatus.OK };
   }
 
   public async removePage(payload: RemovePageRequest): Promise<RemovePageResponse> {
