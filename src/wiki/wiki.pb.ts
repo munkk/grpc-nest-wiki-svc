@@ -16,6 +16,16 @@ export interface GetRootsResponse {
   error: string[];
 }
 
+export interface GetChildrenRequest {
+  id: string;
+}
+
+export interface GetChildrenResponse {
+  data: WikiPage[];
+  status: number;
+  error: string[];
+}
+
 export interface GetByIdRequest {
   id: string;
 }
@@ -69,6 +79,8 @@ export const WIKI_PACKAGE_NAME = 'wiki';
 export interface WikiServiceClient {
   getRoots(request: GetRootsRequest): Observable<GetRootsResponse>;
 
+  getChildren(request: GetChildrenRequest): Observable<GetChildrenResponse>;
+
   getById(request: GetByIdRequest): Observable<GetByIdResponse>;
 
   addPage(request: AddPageRequest): Observable<AddPageResponse>;
@@ -83,6 +95,13 @@ export interface WikiServiceController {
     | Promise<GetRootsResponse>
     | Observable<GetRootsResponse>
     | GetRootsResponse;
+
+  getChildren(
+    request: GetChildrenRequest,
+  ):
+    | Promise<GetChildrenResponse>
+    | Observable<GetChildrenResponse>
+    | GetChildrenResponse;
 
   getById(
     request: GetByIdRequest,
@@ -104,6 +123,7 @@ export function WikiServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
       'getRoots',
+      'getChildren',
       'getById',
       'addPage',
       'removePage',
