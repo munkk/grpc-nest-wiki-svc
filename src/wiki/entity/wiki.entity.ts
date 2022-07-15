@@ -1,6 +1,8 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, UpdateDateColumn } from 'typeorm';
+import { Timestamp } from '../google/protobuf/timestamp.pb';
 
 @Entity({name: 'pages'})
+@Tree("closure-table")
 export class WikiPage extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string;
@@ -17,15 +19,18 @@ export class WikiPage extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   public ownerId: string;
 
-  @ManyToOne(() => WikiPage, page => page.children)
+  @TreeParent({ onDelete: 'CASCADE' })
   public parent: WikiPage;
 
-  @OneToMany(() => WikiPage, (page) => page.parent)
+  @TreeChildren()
   public children: WikiPage[];
 
+  @Column({ type: 'int', nullable: true, default: 0 })
+  public childrenCount: number;
+
   @CreateDateColumn()
-  public created_at: Date;
+  public createdAt: Timestamp;
 
   @UpdateDateColumn()
-  public update_at: Date;
+  public updatedAt: Timestamp;
 }

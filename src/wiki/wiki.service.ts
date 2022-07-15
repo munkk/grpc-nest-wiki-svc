@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, EntityManager, Repository, TreeRepository } from 'typeorm';
 
 import { WikiPage } from './entity/wiki.entity';
 import { AddPageRequest, AddPageResponse, GetRootsRequest, GetRootsResponse, RemovePageRequest, RemovePageResponse } from './wiki.pb';
@@ -11,14 +11,14 @@ export class WikiService {
   @InjectRepository(WikiPage)
   private readonly repository: Repository<WikiPage>;
 
+  @InjectEntityManager() 
+  private readonly manager: EntityManager;
+
   public async getRoots(payload: GetRootsRequest): Promise<GetRootsResponse> {
+    const treeRepository: TreeRepository<WikiPage> = this.manager.getTreeRepository(WikiPage);
     try {
-      const pages = await this.repository.find({
-        where: { 
-          isRoot: true 
-        }
-      })
-      return { data: pages, error: null, status: HttpStatus.OK };
+      const rootPages = await treeRepository.findTrees({depth: 0});
+      return { data: rootPages, error: null, status: HttpStatus.OK };
     } catch (err) {
       return { data: null, error: err.detail, status: HttpStatus.OK  };
     }
@@ -30,6 +30,8 @@ export class WikiService {
         parent = await this.repository.findOneBy({
             id: payload.parentId
         })
+        parent.childrenCount++;
+        parent.save();
     }
 
     const newPage = await this.repository.create({

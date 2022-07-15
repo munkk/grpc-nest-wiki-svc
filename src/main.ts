@@ -12,6 +12,7 @@ async function bootstrap() {
       url: '0.0.0.0:50055',
       package: protobufPackage,
       protoPath: join('node_modules/grpc-nest-proto/proto/wiki.proto'),
+      loader: { keepCase: true },
     },
   });
 

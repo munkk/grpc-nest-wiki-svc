@@ -11,8 +11,7 @@ export class WikiController {
 
   @GrpcMethod(WIKI_SERVICE_NAME, 'GetRoots')
   private async getRoots(data: GetRootsRequest): Promise<GetRootsResponse> {
-    const res = this.service.getRoots(data);
-    return res;
+    return this.service.getRoots(data);
   }
 
   @GrpcMethod(WIKI_SERVICE_NAME, 'AddPage')

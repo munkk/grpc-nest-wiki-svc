@@ -3,6 +3,7 @@ import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import * as Long from 'long';
 import * as _m0 from 'protobufjs/minimal';
 import { Observable } from 'rxjs';
+import { Timestamp } from './google/protobuf/timestamp.pb';
 
 export const protobufPackage = 'wiki';
 
@@ -10,7 +11,7 @@ export const protobufPackage = 'wiki';
 export interface GetRootsRequest {}
 
 export interface GetRootsResponse {
-  data: any[];
+  data: WikiPage[];
   status: number;
   error: string[];
 }
@@ -54,12 +55,13 @@ export interface RemovePageResponse {
 export interface WikiPage {
   id: string;
   isRoot: boolean;
-  parentId: string;
+  parent: WikiPage | undefined;
   name: string;
   html: string;
   children: WikiPage[];
-  createdAt: string;
-  updatedAt: string;
+  childrenCount: number;
+  createdAt: Timestamp | undefined;
+  updatedAt: Timestamp | undefined;
 }
 
 export const WIKI_PACKAGE_NAME = 'wiki';
