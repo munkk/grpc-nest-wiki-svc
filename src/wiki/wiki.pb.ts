@@ -26,15 +26,23 @@ export interface GetChildrenResponse {
   error: string[];
 }
 
-export interface GetByIdRequest {
+export interface GetParentRequest {
   id: string;
 }
 
-export interface GetByIdResponse {
+export interface GetParentResponse {
+  data: WikiPage | undefined;
   status: number;
+  error: string[];
+}
+
+export interface GetPageRequest {
   id: string;
-  name: string;
-  children: WikiPage[];
+}
+
+export interface GetPageResponse {
+  data: WikiPage | undefined;
+  status: number;
   error: string[];
 }
 
@@ -81,7 +89,9 @@ export interface WikiServiceClient {
 
   getChildren(request: GetChildrenRequest): Observable<GetChildrenResponse>;
 
-  getById(request: GetByIdRequest): Observable<GetByIdResponse>;
+  getParent(request: GetParentRequest): Observable<GetParentResponse>;
+
+  getPage(request: GetPageRequest): Observable<GetPageResponse>;
 
   addPage(request: AddPageRequest): Observable<AddPageResponse>;
 
@@ -103,9 +113,16 @@ export interface WikiServiceController {
     | Observable<GetChildrenResponse>
     | GetChildrenResponse;
 
-  getById(
-    request: GetByIdRequest,
-  ): Promise<GetByIdResponse> | Observable<GetByIdResponse> | GetByIdResponse;
+  getParent(
+    request: GetParentRequest,
+  ):
+    | Promise<GetParentResponse>
+    | Observable<GetParentResponse>
+    | GetParentResponse;
+
+  getPage(
+    request: GetPageRequest,
+  ): Promise<GetPageResponse> | Observable<GetPageResponse> | GetPageResponse;
 
   addPage(
     request: AddPageRequest,
@@ -124,7 +141,8 @@ export function WikiServiceControllerMethods() {
     const grpcMethods: string[] = [
       'getRoots',
       'getChildren',
-      'getById',
+      'getParent',
+      'getPage',
       'addPage',
       'removePage',
     ];

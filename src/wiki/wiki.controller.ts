@@ -2,7 +2,7 @@ import { Controller, Inject, Param, Query, Req } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 
 import { WikiService } from './wiki.service';
-import { AddPageRequest, AddPageResponse, GetChildrenRequest, GetChildrenResponse, GetRootsRequest, GetRootsResponse, RemovePageRequest, RemovePageResponse, WIKI_SERVICE_NAME } from './wiki.pb';
+import { AddPageRequest, AddPageResponse, GetChildrenRequest, GetChildrenResponse, GetPageRequest, GetPageResponse, GetParentRequest, GetParentResponse, GetRootsRequest, GetRootsResponse, RemovePageRequest, RemovePageResponse, WIKI_SERVICE_NAME } from './wiki.pb';
 
 @Controller('wiki')
 export class WikiController {
@@ -14,9 +14,19 @@ export class WikiController {
     return this.service.getRoots(data);
   }
 
+  @GrpcMethod(WIKI_SERVICE_NAME, 'GetParent')
+  private async getParent(data: GetParentRequest): Promise<GetParentResponse> {
+    return this.service.getParent(data);
+  }
+
   @GrpcMethod(WIKI_SERVICE_NAME, 'GetChildren')
   private async getChildren(data: GetChildrenRequest): Promise<GetChildrenResponse> {
     return this.service.getChildren(data);
+  }
+
+  @GrpcMethod(WIKI_SERVICE_NAME, 'GetPage')
+  private async getPage(data: GetPageRequest): Promise<GetPageResponse> {
+    return this.service.getPage(data);
   }
 
   @GrpcMethod(WIKI_SERVICE_NAME, 'AddPage')

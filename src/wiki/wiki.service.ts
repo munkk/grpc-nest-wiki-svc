@@ -13,6 +13,10 @@ import {
   AddPageResponse,
   GetChildrenRequest,
   GetChildrenResponse,
+  GetPageRequest,
+  GetPageResponse,
+  GetParentRequest,
+  GetParentResponse,
   GetRootsRequest,
   GetRootsResponse,
   RemovePageRequest,
@@ -26,6 +30,7 @@ export class WikiService {
 
   @InjectEntityManager()
   private readonly manager: EntityManager;
+  
 
   public async getRoots(payload: GetRootsRequest): Promise<GetRootsResponse> {
     const treeRepository = this.manager.getTreeRepository(WikiPage);
@@ -37,17 +42,46 @@ export class WikiService {
     }
   }
 
+  
   public async getChildren(
     query: GetChildrenRequest,
   ): Promise<GetChildrenResponse> {
     const treeRepository = this.manager.getTreeRepository(WikiPage);
     try {
-      const entity = await this.repository.findOneBy({
+      const entity = await treeRepository.findOneBy({
         id: query.id,
       });
-      const wtf = await treeRepository.findDescendants(entity); // WTF???
-      const children = wtf.filter(ent => ent.id !== query.id);
-      return { data: children, error: null, status: HttpStatus.OK };
+      const tree = await treeRepository.findDescendantsTree(entity, {depth: 1});
+      return { data: tree.children, error: null, status: HttpStatus.OK };
+    } catch (err) {
+      return { data: null, error: err, status: HttpStatus.OK };
+    }
+  }
+
+  public async getParent(
+    query: GetParentRequest,
+  ): Promise<GetParentResponse> {
+    const treeRepository = this.manager.getTreeRepository(WikiPage);
+    try {
+      const entity = await treeRepository.findOneBy({
+        id: query.id,
+      });
+      const tree = await treeRepository.findAncestorsTree(entity, {relations: ["parent"] });
+      return { data: tree.parent, error: null, status: HttpStatus.OK };
+    } catch (err) {
+      return { data: null, error: err.detail, status: HttpStatus.OK };
+    }
+  }
+
+  public async getPage(
+    query: GetPageRequest,
+  ): Promise<GetPageResponse> {
+    const treeRepository = this.manager.getTreeRepository(WikiPage);
+    try {
+      const entity = await treeRepository.findOneBy({
+        id: query.id,
+      });
+      return { data: entity, error: null, status: HttpStatus.OK };
     } catch (err) {
       return { data: null, error: err.detail, status: HttpStatus.OK };
     }
